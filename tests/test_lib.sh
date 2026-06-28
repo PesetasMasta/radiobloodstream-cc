@@ -20,17 +20,20 @@ printf '#!/bin/sh\n' > "$fakebin/mpv"; chmod +x "$fakebin/mpv"
 assert_eq "$(PATH="$fakebin:$PATH" detect_player)" "mpv" "detect picks mpv"
 
 # detect_player: with an empty PATH it fails (no players) and returns non-zero.
-assert_fail env PATH="$fakebin/none" bash -c ". '$here/../plugins/bloodstream-radio/scripts/lib.sh'; detect_player"
+emptydir="$(mktemp -d)"
+assert_fail bash -c "PATH='$emptydir'; . '$here/../plugins/bloodstream-radio/scripts/lib.sh'; detect_player" # no players on empty PATH
+rmdir "$emptydir"
 
 # is_running: live pid true, dead pid false.
 export BSR_PID_FILE="$(mktemp)"
 . "$here/../plugins/bloodstream-radio/scripts/lib.sh"   # re-source so PID_FILE picks up override
 sleep 30 & livepid=$!
 echo "$livepid" > "$BSR_PID_FILE"
-assert_ok is_running "live pid is running"
+assert_ok is_running # live pid is running
 kill "$livepid" 2>/dev/null
 echo "999999" > "$BSR_PID_FILE"
-assert_fail is_running "dead pid is not running"
+assert_fail is_running # dead pid is not running
 rm -f "$BSR_PID_FILE"
 
+rm -rf "$fakebin"
 pass test_lib
