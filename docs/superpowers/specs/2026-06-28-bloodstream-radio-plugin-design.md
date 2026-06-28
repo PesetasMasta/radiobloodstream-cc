@@ -19,7 +19,7 @@ not a feature of the site itself.
 - **Branded standalone plugin** (own marketplace), not a station entry in the
   existing `claude-music` plugin. A `claude-music` PR is an optional later
   follow-up and is **out of scope** here.
-- **Command name `/brs`** (short, namespaced) with an action argument.
+- **Command name `/bsr`** (BloodStream Radio initials, short, namespaced) with an action argument.
 - **Full v1 feature set:** play, stop, and live now-playing + listener count.
 - **`mpv` is the recommended player.**
 
@@ -44,7 +44,7 @@ radiobloodstream-cc/
 │       ├── .claude-plugin/
 │       │   └── plugin.json        # name, version, description, author
 │       ├── commands/
-│       │   └── brs.md             # the /brs slash command (routes on argument)
+│       │   └── bsr.md             # the /bsr slash command (routes on argument)
 │       └── scripts/
 │           ├── lib.sh             # the 2 URLs + detect_player() + paths
 │           ├── play.sh            # detached playback + PID file
@@ -58,11 +58,11 @@ radiobloodstream-cc/
 
 A single namespaced command with an action argument; default action is `play`.
 
-- `/brs play` — start playback in the background; keeps running while you work.
-- `/brs stop` — stop playback.
-- `/brs now` — print the current track and listener count.
+- `/bsr play` — start playback in the background; keeps running while you work.
+- `/bsr stop` — stop playback.
+- `/bsr now` — print the current track and listener count.
 
-The `brs.md` command reads `$ARGUMENTS` to pick the action and uses
+The `bsr.md` command reads `$ARGUMENTS` to pick the action and uses
 `$CLAUDE_PLUGIN_ROOT` to locate the matching script under `scripts/`.
 
 ## Components and data flow
@@ -129,7 +129,7 @@ Single config + helper module sourced by the others.
 /plugin marketplace add PesetasMasta/radiobloodstream-cc
 /plugin install bloodstream-radio@radiobloodstream-cc
 # then:
-/brs play
+/bsr play
 ```
 
 Plus a prominent "you need a stream player — `brew install mpv`" note.
