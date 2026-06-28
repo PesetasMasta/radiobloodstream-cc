@@ -9,7 +9,7 @@ is_running || exit 0
 # And only if the cache is fresh (guards against a crashed poller).
 [ -f "$NOWPLAYING_CACHE" ] || exit 0
 
-# Freshness: cache mtime within 90s. Portable mtime (BSD stat then GNU stat).
+# Freshness: cache mtime within 90s. Portable mtime (GNU stat then BSD stat).
 now_epoch="$(date +%s)"
 mtime="$(stat -c %Y "$NOWPLAYING_CACHE" 2>/dev/null || stat -f %m "$NOWPLAYING_CACHE" 2>/dev/null)"
 [ -n "$mtime" ] || exit 0
