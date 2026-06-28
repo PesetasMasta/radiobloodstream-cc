@@ -1,0 +1,20 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # jq and node are preinstalled on ubuntu-latest; install jq defensively
+      # so now.sh's parser always has it (it falls back to node otherwise).
+      - name: Ensure jq is available
+        run: jq --version || (sudo apt-get update && sudo apt-get install -y jq)
+
+      - name: Run the bash test suite
+        run: bash tests/run.sh
