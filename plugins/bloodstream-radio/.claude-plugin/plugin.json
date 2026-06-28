@@ -1,6 +1,6 @@
 {
   "name": "bloodstream-radio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Stream BloodStream Radio while you code. /bsr play | stop | now.",
   "author": {
     "name": "PesetasMasta",
