@@ -13,4 +13,11 @@ name="$(basename "$player")"
 # shellcheck disable=SC2046  # word-splitting of player_args is intended
 nohup "$player" $(player_args "$name") "$STREAM_URL" >/dev/null 2>&1 &
 echo "$!" > "$PID_FILE"
+
+# Start the now-playing poller (for the statusline) unless one is already up.
+if ! poller_running; then
+  nohup bash "$(dirname "${BASH_SOURCE[0]}")/nowplaying-poller.sh" >/dev/null 2>&1 &
+  echo "$!" > "$POLLER_PID_FILE"
+fi
+
 echo "Playing BloodStream Radio (via $name). /bsr stop to end."

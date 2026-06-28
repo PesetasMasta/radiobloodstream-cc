@@ -44,4 +44,16 @@ bash "$scripts/bsr.sh" stop >/dev/null
 out="$(bash "$scripts/bsr.sh" bogus)"
 assert_contains "$out" "usage" "dispatcher rejects unknown action"
 
+# Poller lifecycle: play starts a poller, stop removes it + the cache.
+export BSR_POLLER_PID_FILE="$(mktemp -u)"
+export BSR_NOWPLAYING_CACHE="$(mktemp -u)"
+bash "$scripts/play.sh" >/dev/null
+assert_ok test -f "$BSR_POLLER_PID_FILE"          # poller pid recorded
+ppid="$(cat "$BSR_POLLER_PID_FILE")"
+assert_ok kill -0 "$ppid"                         # poller alive
+bash "$scripts/stop.sh" >/dev/null
+assert_fail test -f "$BSR_POLLER_PID_FILE"        # poller pid removed
+assert_fail test -f "$BSR_NOWPLAYING_CACHE"       # cache removed
+assert_fail kill -0 "$ppid"                       # poller process gone
+
 pass test_playstop
