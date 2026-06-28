@@ -3,30 +3,45 @@
 # shellcheck source=lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-# Read status JSON on stdin, print a human line.
-parse_now() {
+# Read status JSON on stdin, print one line: "<title>\t<listeners>".
+# Offline / no live source -> empty title and 0. Single jq/node pass.
+current_status() {
   local json
   json="$(cat)"
   if command -v jq >/dev/null 2>&1; then
-    local src title listeners
+    local src
     src='.icestats.source | if type=="array" then .[0] else . end'
-    title="$(printf '%s' "$json" | jq -r "($src) | .title // empty" 2>/dev/null)"
-    listeners="$(printf '%s' "$json" | jq -r "($src) | .listeners // 0" 2>/dev/null)"
-    if [ -z "$title" ]; then
-      echo "BloodStream Radio is offline right now."
-    else
-      echo "Now playing: $title · $listeners listeners"
-    fi
+    printf '%s' "$json" | jq -r "[($src | .title // \"\"), ($src | .listeners // 0)] | @tsv" 2>/dev/null \
+      || printf '\t0'
   else
     printf '%s' "$json" | node -e '
       let d=""; process.stdin.on("data",c=>d+=c).on("end",()=>{
         try {
           const s = JSON.parse(d).icestats.source;
           const o = Array.isArray(s) ? s[0] : s;
-          if (!o || !o.title) { console.log("BloodStream Radio is offline right now."); return; }
-          console.log(`Now playing: ${o.title} · ${o.listeners || 0} listeners`);
-        } catch (e) { console.log("BloodStream Radio is offline right now."); }
+          const title = (o && o.title) ? o.title : "";
+          const listeners = (o && o.listeners != null) ? o.listeners : 0;
+          console.log(`${title}\t${listeners}`);
+        } catch (e) { console.log(`\t0`); }
       });'
+  fi
+}
+
+# Bare "Artist - Title" (or empty when offline).
+current_title() {
+  current_status | cut -f1
+}
+
+# Human one-line status, built on current_status (keeps parsing DRY).
+parse_now() {
+  local line title listeners
+  line="$(current_status)"
+  title="${line%%$'\t'*}"
+  listeners="${line#*$'\t'}"
+  if [ -z "$title" ]; then
+    echo "BloodStream Radio is offline right now."
+  else
+    echo "Now playing: $title · $listeners listeners"
   fi
 }
 
@@ -39,7 +54,7 @@ main() {
   printf '%s' "$json" | parse_now
 }
 
-# Run main only when executed directly (so tests can source parse_now).
+# Run main only when executed directly (so tests can source the functions).
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
   main "$@"
 fi
