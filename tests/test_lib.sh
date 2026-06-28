@@ -35,5 +35,22 @@ echo "999999" > "$BSR_PID_FILE"
 assert_fail is_running # dead pid is not running
 rm -f "$BSR_PID_FILE"
 
+# New config defaults present.
+assert_eq "$NOWPLAYING_CACHE" "${TMPDIR:-/tmp}/bloodstream-radio.nowplaying" "nowplaying cache default"
+assert_eq "$POLLER_PID_FILE" "${TMPDIR:-/tmp}/bloodstream-radio.poller.pid" "poller pid default"
+assert_eq "$POLL_INTERVAL" "20" "poll interval default"
+assert_eq "$SHOW_LISTENERS" "1" "show listeners default"
+
+# poller_running mirrors is_running on POLLER_PID_FILE.
+export BSR_POLLER_PID_FILE="$(mktemp)"
+. "$here/../plugins/bloodstream-radio/scripts/lib.sh"   # re-source to pick up override
+sleep 30 & ppid=$!
+echo "$ppid" > "$BSR_POLLER_PID_FILE"
+assert_ok poller_running    # live poller pid
+kill "$ppid" 2>/dev/null
+echo "999999" > "$BSR_POLLER_PID_FILE"
+assert_fail poller_running  # dead poller pid
+rm -f "$BSR_POLLER_PID_FILE"
+
 rm -rf "$fakebin"
 pass test_lib
