@@ -30,6 +30,40 @@ sudo dnf install mpv      # Fedora
 
 `/bsr` with no argument is the same as `/bsr play`.
 
+## Statusline now-playing (optional)
+
+Show the current track in your Claude Code statusline while the radio plays:
+`🩸 Artist - Title · N` (N = listeners). It appears only while playing and
+disappears when you `/bsr stop`.
+
+Add this to the end of your statusline command script (the script your
+`statusLine` setting in `~/.claude/settings.json` points at), so it composes
+with whatever you already show:
+
+```bash
+# BloodStream Radio now-playing segment (only renders while playing)
+bsr_seg=$(bash /path/to/bloodstream-radio/scripts/statusline-segment.sh 2>/dev/null)
+[ -n "$bsr_seg" ] && printf '  |  %s' "$bsr_seg"
+```
+
+Replace `/path/to/bloodstream-radio` with the plugin's installed location. The
+statusline runs outside the plugin, so `${CLAUDE_PLUGIN_ROOT}` is not available
+there — use an absolute path.
+
+If you don't already have a statusline command, set `statusLine` in
+`~/.claude/settings.json` to a script containing just those lines.
+
+### Tuning
+
+| Env var | Default | Effect |
+|---|---|---|
+| `BSR_STATUS_SHOW_LISTENERS` | `1` | Set `0` to hide the `· N` listener count |
+| `BSR_POLL_INTERVAL` | `20` | Seconds between now-playing refreshes |
+
+The segment reads a small cache file refreshed by a background poller that
+`/bsr play` starts and `/bsr stop` ends — your statusline never makes a network
+call.
+
 ## Requirements & notes
 
 - macOS, Linux, and WSL. Native Windows is not supported in this version.
