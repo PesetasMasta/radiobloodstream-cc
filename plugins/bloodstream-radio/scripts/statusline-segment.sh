@@ -11,7 +11,7 @@ is_running || exit 0
 
 # Freshness: cache mtime within 90s. Portable mtime (BSD stat then GNU stat).
 now_epoch="$(date +%s)"
-mtime="$(stat -f %m "$NOWPLAYING_CACHE" 2>/dev/null || stat -c %Y "$NOWPLAYING_CACHE" 2>/dev/null)"
+mtime="$(stat -c %Y "$NOWPLAYING_CACHE" 2>/dev/null || stat -f %m "$NOWPLAYING_CACHE" 2>/dev/null)"
 [ -n "$mtime" ] || exit 0
 [ "$((now_epoch - mtime))" -lt 90 ] || exit 0
 
