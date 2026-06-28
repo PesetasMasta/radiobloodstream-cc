@@ -48,6 +48,9 @@ assert_contains "$out" "usage" "dispatcher rejects unknown action"
 export BSR_POLLER_PID_FILE="$(mktemp -u)"
 export BSR_NOWPLAYING_CACHE="$(mktemp -u)"
 bash "$scripts/play.sh" >/dev/null
+# play seeds the loading-state cache synchronously (empty title + 0), so the
+# 🩸 shows on the next render before the poller's first fetch resolves a track.
+assert_eq "$(cat "$BSR_NOWPLAYING_CACHE" 2>/dev/null)" "$(printf '\t0')" "play seeds loading marker"
 assert_ok test -f "$BSR_POLLER_PID_FILE"          # poller pid recorded
 ppid="$(cat "$BSR_POLLER_PID_FILE")"
 assert_ok kill -0 "$ppid"                         # poller alive

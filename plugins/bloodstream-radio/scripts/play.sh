@@ -14,6 +14,10 @@ name="$(basename "$player")"
 nohup "$player" $(player_args "$name") "$STREAM_URL" >/dev/null 2>&1 &
 echo "$!" > "$PID_FILE"
 
+# Seed the loading state: an empty-title cache line makes the 🩸 appear on the
+# next statusline render, before the poller's first fetch resolves a track.
+printf '\t0\n' > "$NOWPLAYING_CACHE"
+
 # Start the now-playing poller (for the statusline) unless one is already up.
 if ! poller_running; then
   nohup bash "$(dirname "${BASH_SOURCE[0]}")/nowplaying-poller.sh" >/dev/null 2>&1 &
