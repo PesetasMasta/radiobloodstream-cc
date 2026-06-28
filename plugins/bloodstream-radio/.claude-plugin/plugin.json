@@ -1,0 +1,11 @@
+{
+  "name": "bloodstream-radio",
+  "version": "0.1.0",
+  "description": "Stream BloodStream Radio while you code. /bsr play | stop | now.",
+  "author": {
+    "name": "PesetasMasta",
+    "url": "https://radiobloodstream.com"
+  },
+  "homepage": "https://radiobloodstream.com",
+  "keywords": ["radio", "music", "metal", "focus", "stream"]
+}

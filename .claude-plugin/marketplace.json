@@ -1,0 +1,20 @@
+{
+  "name": "radiobloodstream-cc",
+  "owner": {
+    "name": "PesetasMasta",
+    "url": "https://github.com/PesetasMasta"
+  },
+  "metadata": {
+    "description": "BloodStream Radio for Claude Code — listen while you code.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "bloodstream-radio",
+      "source": "./plugins/bloodstream-radio",
+      "description": "Stream BloodStream Radio (metal/rock/punk) in the background while you code.",
+      "version": "0.1.0",
+      "category": "fun"
+    }
+  ]
+}
